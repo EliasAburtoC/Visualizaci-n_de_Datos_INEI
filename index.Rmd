@@ -1,0 +1,290 @@
+---
+title: "PRODUCCIÓN AGRÍCOLA EN LAMBAYEQUE"
+author: "Elías Aburto-Camacllanqui"
+date: "16-01-2023"
+output:
+  xaringan::moon_reader:
+    css: [xaringan-themer.css, custom.css]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: 16:11
+encoding: "UTF-8"
+---
+
+class: inverse, center, middle
+# .font150[Encuesta Nacional Agropecuaria 2019]
+
+
+
+---
+# DATOS DE LA UNIDAD AGRÍCOLA
+.font105[A nivel **nacional** (ENA, 2019).]
+
+
+```{r, include=FALSE}
+library(tidyverse)
+library(patchwork)
+
+cap1200 <- haven::read_sav("20_Cap1200.sav")
+
+```
+
+
+```{r echo=FALSE, out.width = "70%", message = FALSE, warning = FALSE}
+table(cap1200$NOMBREDD, useNA = "alw")
+```
+
+```{r echo=FALSE, out.width = "70%", message = FALSE, warning = FALSE}
+cap1200 %>% 
+  count(CODIGO) %>%
+  mutate(Porcentaje = round(n/sum(n)*100,1)) %>% 
+  print(n = Inf)
+
+```
+
+
+---
+
+# DATOS DE LA UNIDAD AGRÍCOLA
+.font105[A nivel del **departamento de Lambayeque** (ENA, 2019).]
+
+
+```{r, include=FALSE}
+provincia <- c(`01`="Chiclayo",
+               `02`="Ferreñafe",
+               `03`="Lambayeque")
+
+cap1200_depart <- cap1200 %>%
+  filter(NOMBREDD %in% "LAMBAYEQUE") %>%
+  mutate(PROVINCIA = CCPP) %>%
+  mutate(PROVINCIA = recode_factor(PROVINCIA,!!!provincia))
+
+```
+
+
+```{r echo=FALSE, out.width = "70%", message = FALSE, warning = FALSE}
+table(cap1200_depart$PROVINCIA, useNA = "alw")
+```
+
+
+```{r echo=FALSE, out.width = "70%", message = FALSE, warning = FALSE}
+cap1200_depart %>% 
+  count(CODIGO) %>%
+  mutate(Porcentaje = round(n/sum(n)*100,1)) %>% 
+  print(n = Inf)
+```
+
+
+
+---
+
+# DATOS DE LA UNIDAD AGRÍCOLA
+.font105[A nivel de la **provincia de Lambayeque** (ENA, 2019).]
+
+
+```{r, include=FALSE}
+distrito <- c(`01`="Lambayeque",
+              `02`="Chochope",
+              `03`="Illimo",
+              `04`="Jayanca",
+              `05`="Mochumi",
+              `06`="Morrope",
+              `07`="Motupe",
+              `08`="Olmos",
+              `09`="Pacora",
+              `10`="Salas",
+              `11`="San_Jose",
+              `12`="Tucume")
+
+cap1200_provin <- cap1200_depart %>%
+  filter(PROVINCIA %in% "Lambayeque") %>%
+  mutate(DISTRITO = CCDI) %>%
+  mutate(DISTRITO = recode_factor(DISTRITO,!!!distrito))
+
+```
+
+
+
+```{r echo=FALSE, out.width = "70%", message = FALSE, warning = FALSE}
+cap1200_provin %>% 
+  count(CODIGO) %>%
+  mutate(Porcentaje = round(n/sum(n)*100,1)) %>% 
+  print(n = Inf)
+```
+
+
+```{r echo=FALSE, out.width = "70%", message = FALSE, warning = FALSE}
+table(cap1200_provin$DISTRITO, useNA = "alw")
+```
+
+---
+
+### DATOS DE LA UNIDAD AGRÍCOLA
+.font105[A nivel del **distrito de Lambayeque** (ENA, 2019).]
+
+```{r, include=FALSE}
+ena_lambayeque <- cap1200_provin %>%
+  filter(DISTRITO %in% "Lambayeque")
+
+```
+
+
+
+```{r echo=FALSE, out.width = "60%", message = FALSE, warning = FALSE}
+ena_lambayeque %>% 
+  count(CODIGO) %>%
+  mutate(Porcentaje = round(n/sum(n)*100,1)) %>% 
+  print(n = Inf)
+
+```
+
+
+```{r, include=FALSE}
+ena_pequelamba <- ena_lambayeque %>%
+  filter(CODIGO %in% "1")
+
+```
+
+
+
+
+---
+
+class: inverse, center, middle
+# .font150[Datos de pequeños y medianos productores agrícolas del distrito de Lambayeque]
+
+
+---
+### CULTIVOS COSECHADOS
+.font105[durante los últimos 12 meses (ENA, 2019).] 
+
+
+```{r, include=FALSE}
+cap200ab <- haven::read_sav("02_Cap200ab.sav")
+
+
+cap200ab_lam <- cap200ab %>%
+  filter(NOMBREDD %in% "LAMBAYEQUE") %>%
+  mutate(PROVINCIA = CCPP) %>%
+  mutate(PROVINCIA = recode_factor(PROVINCIA,!!!provincia)) %>%
+  filter(PROVINCIA %in% "Lambayeque") %>%
+  mutate(DISTRITO = CCDI) %>%
+  mutate(DISTRITO = recode_factor(DISTRITO,!!!distrito)) %>%
+  filter(DISTRITO %in% "Lambayeque") %>%
+  filter(CODIGO %in% "1")
+
+```
+
+
+```{r echo=FALSE, out.width = "60%", message = FALSE, warning = FALSE}
+ggplot(cap200ab_lam,
+       aes(y = P204_NOM)) +
+  geom_bar(
+    color = "black",
+    fill = "sky blue"
+  ) +
+  labs(
+    title = "Frecuencia de parcelas que cosecharon cultivos",
+    x = "Número de parcelas",
+    y = "Cultivos cosechados",
+  ) + 
+  theme_classic()
+```
+
+
+
+---
+
+
+### TIPOS DE CULTIVOS COSECHADOS
+.font105[Durante los últimos 12 meses (ENA, 2019).] 
+
+```{r echo=FALSE, out.width = "60%", message = FALSE, warning = FALSE}
+cap200ab_lam %>% 
+  count(P204_TIPO) %>%
+  mutate(
+    Porcentaje = round(n/sum(n),2))
+```
+
+
+---
+
+### CONDUCCIÓN DEL CULTIVO
+
+```{r echo=FALSE, out.width = "60%", message = FALSE, warning = FALSE}
+cap200ab_lam %>% 
+  count(P208) %>%
+  mutate(
+    Porcentaje = round(n/sum(n),2))%>% 
+  print(n = Inf)
+```
+
+
+---
+
+### PROCEDENCIA DEL AGUA PARA EL RIEGO
+
+
+```{r echo=FALSE, out.width = "60%", message = FALSE, warning = FALSE}
+cap200ab_lam %>% 
+  count(P212) %>%
+  mutate(
+    Porcentaje = round(n/sum(n),2))%>% 
+  print(n = Inf)
+```
+
+
+---
+### SISTEMA DE RIEGO UTILIZADO
+
+```{r echo=FALSE, out.width = "60%", message = FALSE, warning = FALSE}
+cap200ab_lam %>% 
+  count(P213) %>%
+  mutate(
+    Porcentaje = round(n/sum(n),2))%>% 
+  print(n = Inf)
+```
+
+---
+### SEMILLA UTILIZADA
+
+
+```{r echo=FALSE, out.width = "60%", message = FALSE, warning = FALSE}
+cap200ab_lam %>% 
+  count(P214) %>%
+  mutate(
+    Porcentaje = round(n/sum(n),2))%>% 
+  print(n = Inf)
+```
+
+---
+### SUPERFICIE COSECHADA
+.font105[Si cosechó toda la superficie que sembró (ENA, 2019).]
+
+```{r echo=FALSE, out.width = "60%", message = FALSE, warning = FALSE}
+cap200ab_lam %>% 
+  count(P215) %>%
+  mutate(
+    Porcentaje = round(n/sum(n),2))%>% 
+  print(n = Inf)
+
+```
+
+---
+
+
+
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+
+
+
